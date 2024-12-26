@@ -1,4 +1,5 @@
 ﻿@page "/planning"
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
 <h2>Planning</h2>
 <h4>Anyone considering a new database project might like to ask themselves the following questions...</h4>
 <br />
@@ -122,6 +123,16 @@
 	<li>A JCB has just chopped through our data cable, what do we do now?</li>
 	<li>John DOA has just lost his mobile which he uses to access the system, what do we do now?</li>
 </ol>
+<div class="row my-2" style="background-color:Gainsboro; padding-left:0.5em;padding-top:0.5em; padding-bottom:0.02em">
+	<h3>What Next?</h3>
+</div>
+<h4>
+	<button class="btn btn-sm  btn-link" @onclick=NavToSpecification><h4>Click here</h4></button>
+	 to learn about how a specification is created using teamwork, brainstorming and lateral thinking.
+</h4>
 @code {
-
+	void NavToSpecification()
+	{
+		NavMan.NavigateTo($"/specification");
+	}
 }
