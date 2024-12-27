@@ -1,6 +1,71 @@
 ﻿@page "/emailpicker"
+@using BlazorApp.Shared
+@inject IJSRuntime JSRuntime
+@inject IWebAssemblyHostEnvironment Env;
+<style>
+	.dropbtn {
+		background-color: #04AA6D;
+		color: white;
+		padding: 8px;
+		font-size: 16px;
+		border: none;
+	}
+
+	.dropdown {
+		position: relative;
+		display: inline-block;
+	}
+
+	.dropdown-content {
+		display: none;
+		position: absolute;
+		background-color: #f1f1f1;
+		min-width: 160px;
+		box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		z-index: 1;
+	}
+
+		.dropdown-content a {
+			color: black;
+			padding: 12px 16px;
+			text-decoration: none;
+			display: block;
+		}
+
+			.dropdown-content a:hover {
+				background-color: #ddd;
+			}
+
+	.dropdown:hover .dropdown-content {
+		display: block;
+	}
+
+	.dropdown:hover .dropbtn {
+		background-color: #3e8e41;
+	}
+</style>
+
 <h3>Email Picker</h3>
 
 @code {
+	//private DataRepo Repo = new DataRepo();
+	private List<string> EmailList = new List<string>();
+	private string SearchParamBegins = string.Empty;
+	private string SearchParamContains = string.Empty;
 
+	bool ShowSpinner { get; set; } = true;
+	string ShowHelp { get; set; } = "";
+	protected override async Task OnInitializedAsync()
+	{
+		string urlString = string.Empty;
+		if (Env.IsDevelopment())
+		{
+			urlString = Globals.HTTPJsonLocalFiles + "Contact.json";
+		}
+		else
+		{
+			urlString = Globals.HTTPJsonWebFiles + "Contact.json";
+		}
+		await Task.Delay(500); // Remove when proper await call is written in
+	}
 }

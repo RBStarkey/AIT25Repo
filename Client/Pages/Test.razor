@@ -74,6 +74,7 @@
 
 			//string jsonFile = await Http.GetStringAsync("/api/GetJsonFile?fileName=Persons.json");
 			//PersonList = JsonConvert.DeserializeObject<List<Person>>(jsonFile) ?? [];
+			await Task.Delay(500); // Remove when proper await call is written in
 		}
 		catch (Exception ex)
 		{
