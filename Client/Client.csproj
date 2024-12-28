@@ -14,9 +14,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\JsonFiles\BoysAndGirls.json" />
-    <None Include="wwwroot\JsonFiles\Contacts90.json" />
-    <None Include="wwwroot\JsonFiles\People.json" />
+    <None Include="wwwroot\JsonFiles\BoysAndGirls.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\JsonFiles\Contacts90.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\JsonFiles\People.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
