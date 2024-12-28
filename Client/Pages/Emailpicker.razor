@@ -29,10 +29,20 @@
 				<thead>
 					<tr class="align-middle" style="text-align:center">
 						<th style="display:none">ID</th>
-						<th></th>
+						<th>
+							<button class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top"
+									@onclick=@EmailOnClick>
+								<strong>Filter</strong> &nbsp;<i class="bi bi-check-square"></i>
+							</button>
+						</th>
 						<th>Name</th>
 						<th>Job Description</th>
-						<th>Email</th>
+						<th>
+							<button class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top"
+									@onclick=@FilterOnClick>
+								<strong>Email</strong> &nbsp;<i class="bi bi-pencil"></i>
+							</button>
+						</th>
 						<th>Mobile</th>
 						<th>Department</th>
 						<th style="display:none">IsVisible</th>
@@ -41,8 +51,8 @@
 						<th style="display:none"></th>
 						<th>
 							<button class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top"
-									title="Uncheck all and clear filters">
-								<strong>Clear</strong> &nbsp;<i class="bi bi-check-square"></i>
+									title="Uncheck all and clear filters" @onclick=@ClearOnClick>
+								<strong>Clear</strong> &nbsp;<i class="bi bi-square"></i>
 							</button>
 						</th>
 						<th>
@@ -58,20 +68,24 @@
 				<tbody>
 					@foreach (Contact item in Repo.ContactList)
 					{
-						<tr class="align-middle">
-							<td style="display:none">@item.Id</td>
-							<td style="display:none">@item.IsSelected</td>
-							<td style="text-align: center">
-								<input type="checkbox" id="@item.Id.ToString()" name="@item.Id.ToString()"
-									   value="add" @bind="@item.IsSelected" style="width:1.5em;height:1.5em" />
-							</td>
-							<td>@item.ContactName</td>
-							<td>@item.JobDescription</td>
-							<td>@item.Email</td>
-							<td>@item.Mobile</td>
-							<td>@item.Department</td>
-							<td style="display:none">@item.IsVisible</td>
-						</tr>
+						if (item.IsVisible)
+						{
+							<tr class="align-middle">
+								<td style="display:none">@item.Id</td>
+								<td style="display:none">@item.IsSelected</td>
+								<td class="pt-3" style="text-align: center">
+									<input type="checkbox" id="@item.Id.ToString()" name="@item.Id.ToString()"
+										   value="add" @bind="@item.IsSelected" style="width:1.5em;height:1.5em" />
+								</td>
+								<td>@item.ContactName</td>
+								<td>@item.JobDescription</td>
+								<td>@item.Email</td>
+								<td>@item.Mobile</td>
+								<td>@item.Department</td>
+								<td style="display:none">@item.IsVisible</td>
+							</tr>
+						}
+
 					}
 
 				</tbody>
@@ -122,7 +136,30 @@
 		await Repo.LoadContactList("Contacts90.json");
 		ShowSpinner = false;
 	}
-
+	void ClearOnClick()
+	{
+		foreach (Contact item in Repo.ContactList)
+		{
+			item.IsSelected = false;
+		}
+	}
+	void FilterOnClick()
+	{
+		foreach (Contact item in Repo.ContactList)
+		{
+			if (!item.IsSelected)
+			{
+				item.IsVisible = !item.IsVisible;
+			}
+		}
+	}
+	void EmailOnClick()
+	{
+		foreach (Contact item in Repo.ContactList)
+		{
+			//item.IsSelected = false;
+		}
+	}
 	void AddEmail(string EmailAddress)
 	{
 		EmailList.Add(EmailAddress);
