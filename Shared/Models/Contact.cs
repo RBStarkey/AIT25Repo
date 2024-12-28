@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace BlazorApp.Client.Models
+namespace BlazorApp.Shared
 {
     public class Contact
     {
@@ -33,7 +33,7 @@ namespace BlazorApp.Client.Models
         [StringLength(4, ErrorMessage = "Telephone Extension is too long. (Max chars: 4)")]
         public string Extension { get; set; }
 
-        [DisplayName("Phone")]
+        [DisplayName("Mobile")]
         [Required]
         [DataType(DataType.PhoneNumber)]
         public string Mobile { get; set; }

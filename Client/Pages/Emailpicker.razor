@@ -1,71 +1,143 @@
 ﻿@page "/emailpicker"
-@using BlazorApp.Shared
 @inject IJSRuntime JSRuntime
 @inject IWebAssemblyHostEnvironment Env;
-<style>
-	.dropbtn {
-		background-color: #04AA6D;
-		color: white;
-		padding: 8px;
-		font-size: 16px;
-		border: none;
-	}
+<div class="container-fluid p-0 m-0">
+	<div class="row w-100 d-inline-flex" style="background-color:navy">
+		<div class="col-sm-11 d-flex justify-content-center" style="padding-top:0.6em;color:white">
+			<h3>Email Picker</h3>
+		</div>
+		<div class="col-sm-1 d-flex justify-content-end" style="padding-top:0.7em">
+			<button class="btn-link" style="background-color:transparent;border-color:transparent"
+					@onclick=ShowHelpClick>
+				<sup><i class="bi bi-info-circle" style="font-size: 2rem; color: white;"></i></sup>
+			</button>
+		</div>
+	</div>
 
-	.dropdown {
-		position: relative;
-		display: inline-block;
-	}
-
-	.dropdown-content {
-		display: none;
-		position: absolute;
-		background-color: #f1f1f1;
-		min-width: 160px;
-		box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-		z-index: 1;
-	}
-
-		.dropdown-content a {
-			color: black;
-			padding: 12px 16px;
-			text-decoration: none;
-			display: block;
+	<div class="row">
+		@if (ShowSpinner)
+		{
+			<div>
+				<span class="sr-only">Loading...</span>
+			</div>
+			<div class="spinner-border" role="status">
+			</div>
 		}
+		else
+		{
+			<table class="table w-auto table-hover table-striped mt-2 Fixed bottom">
+				<thead>
+					<tr class="align-middle" style="text-align:center">
+						<th style="display:none">ID</th>
+						<th></th>
+						<th>Name</th>
+						<th>Job Description</th>
+						<th>Email</th>
+						<th>Mobile</th>
+						<th>Department</th>
+						<th style="display:none">IsVisible</th>
+					</tr>
+					<tr class="align-middle">
+						<th style="display:none"></th>
+						<th>
+							<button class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top"
+									title="Uncheck all and clear filters">
+								<strong>Clear</strong> &nbsp;<i class="bi bi-check-square"></i>
+							</button>
+						</th>
+						<th>
+							<input id="Name" class="form-control" type="text" style="background-color:cornsilk">
+						</th>
+						<th><input id="JobDescription" class="form-control" type="text" style="background-color:cornsilk"></th>
+						<th><input id="Email" class="form-control" type="text" style="background-color:cornsilk"></th>
+						<th><input id="Mobile" class="form-control" type="text" style="background-color:cornsilk"></th>
+						<th><input id="Department" class="form-control" type="text" style="background-color:cornsilk"></th>
+						<th style="display:none">IsVisible</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (Contact item in Repo.ContactList)
+					{
+						<tr class="align-middle">
+							<td style="display:none">@item.Id</td>
+							<td style="display:none">@item.IsSelected</td>
+							<td style="text-align: center">
+								<input type="checkbox" id="@item.Id.ToString()" name="@item.Id.ToString()"
+									   value="add" @bind="@item.IsSelected" style="width:1.5em;height:1.5em" />
+							</td>
+							<td>@item.ContactName</td>
+							<td>@item.JobDescription</td>
+							<td>@item.Email</td>
+							<td>@item.Mobile</td>
+							<td>@item.Department</td>
+							<td style="display:none">@item.IsVisible</td>
+						</tr>
+					}
 
-			.dropdown-content a:hover {
-				background-color: #ddd;
-			}
+				</tbody>
+				<tfoot style="background-color:azure;height:3em">
+					<tr style="text-align:center">
+						<th style="display:none">ID</th>
+						<th></th>
+						<th>Name</th>
+						<th>Job Description</th>
+						<th>Email</th>
+						<th>Mobile</th>
+						<th>Department</th>
+						<th style="display:none">IsVisible</th>
+					</tr>
+				</tfoot>
+			</table>
+		}
+	</div>
 
-	.dropdown:hover .dropdown-content {
-		display: block;
-	}
+	<!--Help-->
+	<div class="offcanvas offcanvas-end @ShowHelp" tabindex="-1" id="offcanvasEmailPicker"
+		 aria-labelledby="offcanvasEmailPickerLabel"
+		 aria-modal="true" role="dialog" style="visibility: visible;background-color:gainsboro">
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="offcanvasExampleLabel">Email Picker - Help</h5>
+			<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close" @onclick=HideHelpClick></button>
+		</div>
+		<div class="offcanvas-body">
+			<div>
+				<h5>Email Picker - Help</h5>
+				<p>
 
-	.dropdown:hover .dropbtn {
-		background-color: #3e8e41;
-	}
-</style>
+				</p>
 
-<h3>Email Picker</h3>
-
+			</div>
+		</div>
+	</div>
+</div>
 @code {
-	//private DataRepo Repo = new DataRepo();
-	private List<string> EmailList = new List<string>();
-	private string SearchParamBegins = string.Empty;
-	private string SearchParamContains = string.Empty;
+	DataRepo Repo = new DataRepo();
+	List<string> EmailList = new List<string>();
 
 	bool ShowSpinner { get; set; } = true;
 	string ShowHelp { get; set; } = "";
 	protected override async Task OnInitializedAsync()
 	{
-		string urlString = string.Empty;
-		if (Env.IsDevelopment())
+
+		await Repo.LoadContactList("Contacts90.json");
+		ShowSpinner = false;
+	}
+
+	void AddEmail(string EmailAddress)
+	{
+		EmailList.Add(EmailAddress);
+	}
+	void ShowHelpClick()
+	{
+		ShowHelp = "show";
+	}
+
+	void HideHelpClick()
+	{
+		// Is the help panel showing?
+		if (ShowHelp == "show")
 		{
-			urlString = Globals.HTTPJsonLocalFiles + "Contact.json";
+			ShowHelp = "";
 		}
-		else
-		{
-			urlString = Globals.HTTPJsonWebFiles + "Contact.json";
-		}
-		await Task.Delay(500); // Remove when proper await call is written in
 	}
 }

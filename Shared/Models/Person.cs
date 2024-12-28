@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace BlazorApp.Client.Models
+namespace BlazorApp.Shared
 {
     public class Person
     {
@@ -51,9 +51,9 @@ namespace BlazorApp.Client.Models
         [DataType(DataType.EmailAddress)]
         //[StringLength(256, ErrorMessage = "Email is too long. (Max chars: 256)")]
         //[RegularExpression(@"^[A-Za-z0-9](([_\.\-]?[a-zA-Z0-9]+)*)@([A-Za-z0-9]+)(([\.\-‌​]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,})$", ErrorMessage = "Email is not well formed")]
-        public string EmailAddress { get; set; }
+        public string EmailAddress { get; set; } = string.Empty;
 
-        [DisplayName("Modified Date-Time")]
+		[DisplayName("Modified Date-Time")]
         [Range(typeof(DateTime), "1 Jan 1970", "31 Dec 3000", ErrorMessage = "Value for {0} must be between {1} and {2}")]
         public DateTime ModifiedDate { get; set; }
 

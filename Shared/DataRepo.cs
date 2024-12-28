@@ -1,43 +1,41 @@
-﻿using BlazorApp.Client.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace BlazorApp.Shared
 {
 	public class DataRepo
 	{
-		public List<Person> PersonList { get => personList; set => personList = value; }
-		public List<Contact> ContactList { get; set; }
-		public List<BoyAndGirl> BoyAndGirlList { get; set; }
+		public List<Person> PersonList { get; set; } = new List<Person>();
+		public List<Contact> ContactList { get; set; } = new List<Contact>();
+		public List<BoyAndGirl> BoyAndGirlList { get; set; } = new List<BoyAndGirl>();
 
-		private static HttpClient HttpClient { get; set; }
-		private List<Person> personList;
-
-		public DataRepo()
-		{
-			PersonList = new List<Person>();
-			ContactList = new List<Contact>();
-			BoyAndGirlList = new List<BoyAndGirl>();
-		}
+		private static readonly HttpClient Client = new HttpClient();
 		public async Task LoadPersonList(string URLString)
 		{
-			HttpResponseMessage response = await HttpClient.GetAsync(URLString);
+			HttpResponseMessage response = await Client.GetAsync(URLString);
 			if(!response.IsSuccessStatusCode)
 			{
 				return;
 			}
 			PersonList = JsonConvert.DeserializeObject<List<Person>>(response.ToString());
 		}
-		public async Task LoadContactList(string UrlString)
+		public async Task LoadContactList(string Filename)
 		{
 			try
 			{
-				HttpResponseMessage response = await HttpClient.GetAsync(UrlString);
-				string responseBody = await response.Content.ReadAsStringAsync();
-				ContactList = JsonConvert.DeserializeObject<List<Contact>>(responseBody);
+				string temp = "https://localhost:7154/JsonFiles/" + Filename;
+
+				var json = await Client.GetStringAsync(temp);
+				ContactList = JsonConvert.DeserializeObject<List<Contact>>(json);
+			}
+			catch (HttpRequestException reqEx)
+			{
+				Console.WriteLine("LoadContactList - Request Exception: " + reqEx.Message);
+
 			}
 			catch (Exception ex)
 			{
@@ -47,7 +45,7 @@ namespace BlazorApp.Shared
 
 	public async Task LoadBoyAndGirlList()
 	{
-		var response = await HttpClient.GetAsync("https://localhost:7071/api/GetBlobFile?key=Data/BoysAndGirls.json");
+		var response = await Client.GetAsync("https://localhost:7071/api/GetBlobFile?key=Data/BoysAndGirls.json");
 		//string json = File.ReadAllText("AIT2024/Client/wwwroot/Data/Contacts90.json");
 		BoyAndGirlList = JsonConvert.DeserializeObject<List<BoyAndGirl>>(response.ToString());
 	}
