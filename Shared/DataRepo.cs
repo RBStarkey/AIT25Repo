@@ -29,6 +29,9 @@ namespace BlazorApp.Shared
 			{
 				string temp = "https://localhost:7154/JsonFiles/" + Filename;
 
+				//https://lively-plant-01455b203.4.azurestaticapps.net/JsonFiles/Contacts90.json
+
+
 				var json = await Client.GetStringAsync(temp);
 				ContactList = JsonConvert.DeserializeObject<List<Contact>>(json);
 			}

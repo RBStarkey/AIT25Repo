@@ -1,6 +1,12 @@
 ﻿@page "/emailpicker"
+@using BlazorApp.Client.Services
 @inject IJSRuntime JSRuntime
 @inject IWebAssemblyHostEnvironment Env;
+@inject HttpClient Http
+@inject ILogger<Emailpicker> Logger
+@inject JsonFileService JsonFileService
+
+
 <div class="container-fluid p-0 m-0">
 	<div class="row w-100 d-inline-flex" style="background-color:navy">
 		<div class="col-sm-11 d-flex justify-content-center" style="padding-top:0.6em;color:white">
@@ -31,7 +37,7 @@
 						<th style="display:none">ID</th>
 						<th>
 							<button class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top"
-									@onclick=@EmailOnClick>
+									@onclick=@FilterOnClick>
 								<strong>Filter</strong> &nbsp;<i class="bi bi-check-square"></i>
 							</button>
 						</th>
@@ -39,7 +45,7 @@
 						<th>Job Description</th>
 						<th>
 							<button class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top"
-									@onclick=@FilterOnClick>
+									@onclick=@EmailOnClick>
 								<strong>Email</strong> &nbsp;<i class="bi bi-pencil"></i>
 							</button>
 						</th>
@@ -66,7 +72,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (Contact item in Repo.ContactList)
+					@foreach (Contact item in ContactList)
 					{
 						if (item.IsVisible)
 						{
@@ -125,27 +131,31 @@
 	</div>
 </div>
 @code {
-	DataRepo Repo = new DataRepo();
+	//DataRepo Repo = new DataRepo();
+	List<Contact> ContactList = new List<Contact>();
 	List<string> EmailList = new List<string>();
 
 	bool ShowSpinner { get; set; } = true;
 	string ShowHelp { get; set; } = "";
 	protected override async Task OnInitializedAsync()
 	{
+		Logger.LogInformation("OnInitializedAsync started");
 
-		await Repo.LoadContactList("Contacts90.json");
+		ContactList = await JsonFileService.GetJsonFileAsync<List<Contact>>("JsonFiles/Contacts90.json");
+		Logger.LogInformation("Contacts =" + ContactList.Count());
+
 		ShowSpinner = false;
 	}
 	void ClearOnClick()
 	{
-		foreach (Contact item in Repo.ContactList)
+		foreach (Contact item in ContactList)
 		{
 			item.IsSelected = false;
 		}
 	}
 	void FilterOnClick()
 	{
-		foreach (Contact item in Repo.ContactList)
+		foreach (Contact item in ContactList)
 		{
 			if (!item.IsSelected)
 			{
@@ -155,7 +165,7 @@
 	}
 	void EmailOnClick()
 	{
-		foreach (Contact item in Repo.ContactList)
+		foreach (Contact item in ContactList)
 		{
 			//item.IsSelected = false;
 		}
