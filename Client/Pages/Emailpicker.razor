@@ -14,8 +14,8 @@
 		<div class="col-sm-1">
 			<!--Home-->
 			<i class="bi bi-house-door" style="font-size: 2rem; color: white"
-			   data-toggle="tooltip" data-placement="bottom" title="Home"
-			   @onclick=HomeClick>
+			data-toggle="tooltip" data-placement="bottom" title="Home"
+			@onclick=HomeClick>
 			</i>
 		</div>
 		<div class="col-sm-10 d-flex justify-content-center" style="padding-top:0.4em;color:white">
@@ -23,16 +23,12 @@
 		</div>
 		<div class="col-sm-1 d-flex justify-content-end" style="padding-top:0.7em">
 			<button class="btn-link" style="background-color:transparent;border-color:transparent"
-					@onclick=ShowHelpClick>
+			@onclick=ShowHelpClick>
 				<sup><i class="bi bi-info-circle" style="font-size: 2rem; color: white;"></i></sup>
 			</button>
 		</div>
 	</div>
-	<div class="row w-100 alert alert-success mt-2 mb-0" role="alert">
-		<h5>
-			@ListToPasteIntoOutlook
-		</h5>
-	</div>
+
 	@if (ShowSpinner)
 	{
 		<div>
@@ -44,23 +40,35 @@
 	@if (!ShowSpinner)
 	{
 		<!--Button Bar-->
-		<div class="row w-100 d-flex justify-content-start p-2 mt-2"
-			 style="background-color:gainsboro;border-radius:10px">
-			<div class="col-sm-2 d-flex justify-content-between">
-				<button class="btn btn-primary" @onclick=ShowEmailListClick>Show Email List</button>
+		<div class="row w-100 d-flex justify-content-start p-2 mt-2 align-middle"
+		style="background-color:gainsboro;border-radius:10px">
+			<div class="col-auto">
+				<button class="btn btn-primary" @onclick=@PreviewClick>
+					Preview Clipboard List &nbsp;<i class="bi bi-eyeglasses"></i>
+				</button>
 			</div>
-			<div class="col-sm-10">
+			<div class="col-auto">
+				<button class="btn btn-primary" @onclick=@CopyToClipBoardClick>Copy to Clipboard &nbsp;<i class="bi bi-clipboard-plus"></i></button>
 			</div>
 		</div>
+
+		@if (Preview)
+		{
+			<div class="row w-100 alert alert-success mt-2 mb-0" role="alert">
+				<h5>
+					@SortedString
+				</h5>
+			</div>
+		}
 		<!--Table-->
 		<table class="table w-auto table-hover table-striped mt-2">
 			<thead>
 				<tr class="align-middle" style="text-align:center">
 					<th style="display:none">ID</th>
 					<th>
-						<input type="checkbox" id="check-uncheck" name="check-uncheck"
-							   value="add" style="width:1.5em;height:1.5em"
-							   @onchange=@((ChangeEventArgs e)=>CheckUncheckAll(e)) />
+						<input class="form-check-input" type="checkbox" id="check-uncheck" name="check-uncheck"
+						value="false" style="width:1.5em;height:1.5em;border: 2px solid black; border-radius: 0.25em"
+						@onchange=@((ChangeEventArgs e)=>CheckUncheckAll(e)) />
 					</th>
 					<th>Name</th>
 					<th>Job Description</th>
@@ -80,8 +88,8 @@
 							<td style="display:none">@item.IsSelected</td>
 							<td class="pt-3" style="text-align: center">
 								<input type="checkbox" id="@item.Id.ToString()" name="@item.Id.ToString()"
-									   value="add" checked="@item.IsSelected" style="width:1.5em;height:1.5em"
-									   @onchange="@(e => AddRemoveEmail(e, item.Id))" />
+								value="add" checked="@item.IsSelected" style="width:1.5em;height:1.5em"
+								@onchange="@(e => AddRemoveEmail(e, item.Id))" />
 							</td>
 							<td>@item.ContactName</td>
 							<td>@item.JobDescription</td>
@@ -100,39 +108,15 @@
 	@if (OKDLogVisible)
 	{
 		<ModalDialogOK Message=@OKDlogMessage
-					   Caption="@OKDlogCaption"
-					   DlogSize=@OKDLogSize
-					   OnClose=@OKDlogClose>
+		Caption="@OKDlogCaption"
+		DlogSize=@OKDLogSize
+		OnClose=@OKDlogClose>
 		</ModalDialogOK>
 	}
-	<!--Email List-->
-	<div class="offcanvas offcanvas-end @ShowEmailList" tabindex="-1" id="offcanvasEmailList"
-		 aria-labelledby="offcanvasEmailListLabel"
-		 aria-modal="true" role="dialog" style="visibility: visible;background-color:azure">
-		<div class="offcanvas-header">
-			<h5 class="offcanvas-title" id="offcanvasExampleLabel">Selected Email Addresses</h5>
-			<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close" @onclick=HideEmailListClick></button>
-		</div>
-		<div class="offcanvas-body" style="font-size:1.25em">
-			@foreach (string item in EmailList)
-			{
-				@(item.ToString() + ";\n")
-			}
-		</div>
-		<div class="offcanvas-footer d-flex justify-content-center p-2">
-			<button type="button" class="btn-primary" aria-label="Format" @onclick=FormatEmailsClick>
-				Click to Format &nbsp;<i class="bi bi-clipboard-plus"></i>
-			</button>
-			<button type="button" class="btn-primary" aria-label="Format" @onclick=CopyToClipboardClick>
-				Copy to Clipboard<i class="bi bi-clipboard-plus"></i>
-			</button>
-		</div>
-
-	</div>
 	<!--Help-->
 	<div class="offcanvas offcanvas-end @ShowHelp" tabindex="-1" id="offcanvasEmailPicker"
-		 aria-labelledby="offcanvasEmailPickerLabel"
-		 aria-modal="true" role="dialog" style="visibility: visible;background-color:gainsboro">
+	aria-labelledby="offcanvasEmailPickerLabel"
+	aria-modal="true" role="dialog" style="visibility: visible;background-color:gainsboro">
 		<div class="offcanvas-header">
 			<h5 class="offcanvas-title" id="offcanvasExampleLabel">Email Picker - Help</h5>
 			<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close" @onclick=HideHelpClick></button>
@@ -149,14 +133,11 @@
 	</div>
 </div>
 @code {
-	//DataRepo Repo = new DataRepo();
 	List<Contact> ContactList = new List<Contact>();
-	string ShowEmailList { get; set; } = "";
-	string ShowOutlookModal { get; set; } = "";
-	List<string> EmailList = new List<string>();
-	string ListToPasteIntoOutlook { get; set; } = "Your formatted email list will appear here.  You should highlight all the text and copy it to the clipboard." +
-				" Then paste it into the 'To' field in Outlook.";
-
+	string ShowOffCanvasEmailList { get; set; } = ""; //Default "", hides the list and "show" makes it appear
+	bool Preview { get; set; } = false; // Shows the EmailList formatted for pasting into a form or document
+	List<string> EmailList = new List<string>(); // The list that appears in the off canvas form
+	string SortedString = string.Empty; // The preview list displayed at the top of the form with a green (alert-success) background
 	bool ShowSpinner { get; set; } = true;
 	string ShowHelp { get; set; } = "";
 
@@ -186,11 +167,10 @@
 		}
 		ShowSpinner = false;
 	}
-	void CheckUncheckAll(ChangeEventArgs e)
+	async Task CheckUncheckAll(ChangeEventArgs e)
 	{
 		try
 		{
-			EmailList.Clear(); // In case use has ticked othere then tick this box
 			bool checkVal = (bool)e.Value;
 			foreach (Contact item in ContactList)
 			{
@@ -204,49 +184,54 @@
 					EmailList.Remove(item.Email);
 				}
 			}
+			if (EmailList.Count() == 0)
+			{
+				SortedString = string.Empty;
+			}
+			else
+			{
+				EmailList = EmailList.OrderBy(e => e).ToList();
+				SortedString = string.Join("; ", EmailList);
+			}
 		}
 		catch (Exception ex)
 		{
-			Logger.LogInformation(ex.Message);
+			Logger.LogInformation("CheckUncheckAll - Exception: " + ex.Message);
 		}
 	}
-	async Task FormatEmailsClick()
+	void PreviewClick()
 	{
-		ShowEmailList = "";
-
-		ListToPasteIntoOutlook = string.Join("; ", EmailList);
+		SortedString = string.Join("; ", EmailList);
+		Preview = !Preview;
 	}
-
-	void ShowEmailListClick()
-	{
-		ShowEmailList = "show";
-	}
-	void HideEmailListClick()
-	{
-		// Is the email list panel showing?
-		if (ShowEmailList == "show")
-		{
-			ShowEmailList = "";
-		}
-	}
-	void AddRemoveEmail(ChangeEventArgs e, Guid id)
+	async Task AddRemoveEmail(ChangeEventArgs e, Guid id)
 	{
 		bool checkVal = (bool)e.Value;
-		var contact = ContactList.FirstOrDefault(c => c.Id == id);
+		Contact contact = ContactList.FirstOrDefault(c => c.Id == id);
 		if (checkVal)
 		{
 			EmailList.Add(contact.Email.Trim());
+			EmailList = EmailList.OrderBy(e => e).ToList();
 		}
 		else
 		{
 			EmailList.Remove(contact.Email.Trim());
 		}
+		SortedString = string.Join("; ", EmailList);
 	}
-	async Task CopyToClipboardClick()
+	async Task CopyToClipBoardClick()
 	{
-		ListToPasteIntoOutlook = string.Join("; ", EmailList);
-		await JSRuntime.InvokeVoidAsync("copyTextToClipboard", ListToPasteIntoOutlook);
-		Logger.LogInformation("copyTextToClipboard" + ListToPasteIntoOutlook);
+		if (SortedString.Length == 0)
+	{
+			OKDlogCaption = "Copy To Clipboard Click";
+			OKDlogMessage = "No text to copy, please tick at least one name";
+			OKDLogSize = Globals.DLogSizeSmall;
+			OKDLogVisible = true;
+			Logger.LogInformation(OKDlogMessage);
+			return;
+	}
+		await JSRuntime.InvokeVoidAsync("copyTextToClipboard", SortedString);
+		Logger.LogInformation("copyTextToClipboard, items: " + EmailList.Count().ToString());
 	}
 	void HomeClick()
 	{
