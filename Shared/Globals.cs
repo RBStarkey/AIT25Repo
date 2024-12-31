@@ -33,6 +33,7 @@ namespace BlazorApp.Shared
 		public const string SearchDotDotDot = "Search...";
 		public const string DLogSizeLarge = "lg";
 		public const string DLogSizeSmall = "sm";
+		public const string InformDBA = ". Please inform the DBA.";
 		//public const string HTTPJsonLocalFiles = "http://localhost:7154/api/DataRepo/LoadContactList?filename=";
 		//public const string HTTPJsonWebFiles = "https://delightful-sky-05669dc03.4.azurestaticapps.net/api/GetJsonFile?filename=";
 
