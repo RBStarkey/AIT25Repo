@@ -1,30 +1,25 @@
 ﻿@page "/emailpicker"
 @using BlazorApp.Client.Services
 @inject IJSRuntime JSRuntime
-@inject IWebAssemblyHostEnvironment Env;
+@inject IWebAssemblyHostEnvironment Env
 @inject HttpClient Http
 @inject ILogger<Emailpicker> Logger
-@inject JsonFileService JsonFileService
+@inject JsonFileService JSFileService
 @inject Microsoft.AspNetCore.Components.NavigationManager NavMan
-
 @using BlazorApp.Shared
 
-<div class="container-fluid p-0 m-0">
-	<div class="row w-100 d-inline-flex pt-2" style="background-color:navy">
+
+<div class="container-fluid">
+	<div class="row row-header w-100 d-inline-flex pt-2" style="background-color:navy">
 		<div class="col-sm-1">
-			<!--Home-->
-			<i class="bi bi-house-door" style="font-size: 2rem; color: white"
-			data-toggle="tooltip" data-placement="bottom" title="Home"
-			@onclick=HomeClick>
-			</i>
+			<i class="bi bi-house-door" style="font-size: 2rem; color: white"data-toggle="tooltip" data-placement="bottom" title="Home" @onclick="HomeClick"></i>
 		</div>
-		<div class="col-sm-10 d-flex justify-content-center" style="padding-top:0.4em;color:white">
+		<div class="col-sm-10 d-flex justify-content-center">
 			<h3>Email Picker</h3>
 		</div>
-		<div class="col-sm-1 d-flex justify-content-end" style="padding-top:0.7em">
-			<button class="btn-link" style="background-color:transparent;border-color:transparent"
-			@onclick=ShowHelpClick>
-				<sup><i class="bi bi-info-circle" style="font-size: 2rem; color: white;"></i></sup>
+		<div class="col-sm-1 d-flex justify-content-end">
+			<button class="btn-link" @onclick="ShowHelpClick">
+				<i class="bi bi-info-circle" style="font-size: 2rem; color: white"></i>
 			</button>
 		</div>
 	</div>
@@ -34,62 +29,69 @@
 		<div>
 			<span class="sr-only">Loading...</span>
 		</div>
-		<div class="spinner-border" role="status">
-		</div>
+		<div class="spinner-border" role="status"></div>
 	}
-	@if (!ShowSpinner)
+	else
 	{
-		<!--Button Bar-->
-		<div class="row w-100 d-flex justify-content-start p-2 mt-2 align-middle"
-		style="background-color:gainsboro;border-radius:10px">
+		<div class="row w-100 d-flex justify-content-start p-2 mt-2 align-middle" style="background-color:gainsboro;border-radius:10px">
 			<div class="col-auto">
-				<button class="btn btn-primary" @onclick=@PreviewClick>
+				<button class="btn btn-primary" @onclick="PreviewClick" disabled=@PreviewCopyButtonsDisabled>
 					Preview Clipboard List &nbsp;<i class="bi bi-eyeglasses"></i>
 				</button>
 			</div>
 			<div class="col-auto">
-				<button class="btn btn-primary" @onclick=@CopyToClipBoardClick>Copy to Clipboard &nbsp;<i class="bi bi-clipboard-plus"></i></button>
+				<button class="btn btn-primary" @onclick="CopyToClipBoardClick" disabled=@PreviewCopyButtonsDisabled>
+					Copy to Clipboard &nbsp;<i class="bi bi-clipboard-plus"></i>
+				</button>
+			</div>
+			<div class="col-auto">
+				<SearchBox SearchQueryChanged="ValueChanged"></SearchBox>
 			</div>
 		</div>
 
 		@if (Preview)
 		{
 			<div class="row w-100 alert alert-success mt-2 mb-0" role="alert">
-				<h5>
-					@SortedString
-				</h5>
+				<h5>@SortedString</h5>
 			</div>
 		}
-		<!--Table-->
+
 		<table class="table w-auto table-hover table-striped mt-2">
 			<thead>
 				<tr class="align-middle" style="text-align:center">
 					<th style="display:none">ID</th>
+					<th></th>
 					<th>
-						<input class="form-check-input" type="checkbox" id="check-uncheck" name="check-uncheck"
-						value="false" style="width:1.5em;height:1.5em;border: 2px solid black; border-radius: 0.25em"
-						@onchange=@((ChangeEventArgs e)=>CheckUncheckAll(e)) />
+						<input class="form-check-input custom-checkbox" type="checkbox" id="check-uncheck" name="check-uncheck"
+						@onchange="CheckUncheckAll" />
 					</th>
 					<th>Name</th>
 					<th>Job Description</th>
-					<th>	Email	</th>
+					<th>Email</th>
 					<th>Mobile</th>
 					<th>Department</th>
 					<th style="display:none">IsVisible</th>
+					<th>Search string</th>
+					<th>Search string2</th>
 				</tr>
 			</thead>
 			<tbody>
+				<tr class="row" style="display:none;">
+					@(RowIndex = 0)
+				</tr>
 				@foreach (Contact item in ContactList)
 				{
 					if (item.IsVisible)
 					{
+						// Skips the rest of the statements and continues with the next iteration of the loop.
+						if (!IsVisible(item.SearchString)) continue;
 						<tr class="align-middle">
+							<td style="width:1em">@(++RowIndex)</td>
 							<td style="display:none">@item.Id</td>
 							<td style="display:none">@item.IsSelected</td>
 							<td class="pt-3" style="text-align: center">
-								<input type="checkbox" id="@item.Id.ToString()" name="@item.Id.ToString()"
-								value="add" checked="@item.IsSelected" style="width:1.5em;height:1.5em"
-								@onchange="@(e => AddRemoveEmail(e, item.Id))" />
+								<input type="checkbox" class="custom-checkbox" id="@item.Id.ToString()" name="@item.Id.ToString()"
+								value="add" checked="@item.IsSelected" @onchange="@(e => AddRemoveEmail(e, item.Id))" />
 							</td>
 							<td>@item.ContactName</td>
 							<td>@item.JobDescription</td>
@@ -97,9 +99,9 @@
 							<td>@item.Mobile</td>
 							<td>@item.Department</td>
 							<td style="display:none">@item.IsVisible</td>
+							<td>@item.SearchString</td>
 						</tr>
 					}
-
 				}
 			</tbody>
 		</table>
@@ -107,41 +109,64 @@
 
 	@if (OKDLogVisible)
 	{
-		<ModalDialogOK Message=@OKDlogMessage
-		Caption="@OKDlogCaption"
-		DlogSize=@OKDLogSize
-		OnClose=@OKDlogClose>
-		</ModalDialogOK>
+		<ModalDialogOK Message="@OKDlogMessage" Caption="@OKDlogCaption" DlogSize="@OKDLogSize" OnClose="@OKDlogClose"></ModalDialogOK>
 	}
-	<!--Help-->
-	<div class="offcanvas offcanvas-end @ShowHelp" tabindex="-1" id="offcanvasEmailPicker"
-	aria-labelledby="offcanvasEmailPickerLabel"
+
+	<div class="offcanvas offcanvas-end @ShowHelp" tabindex="-1" id="offcanvasEmailPicker" aria-labelledby="offcanvasEmailPickerLabel"
 	aria-modal="true" role="dialog" style="visibility: visible;background-color:gainsboro">
 		<div class="offcanvas-header">
 			<h5 class="offcanvas-title" id="offcanvasExampleLabel">Email Picker - Help</h5>
-			<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close" @onclick=HideHelpClick></button>
+			<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close" @onclick="HideHelpClick"></button>
 		</div>
 		<div class="offcanvas-body">
 			<div>
-				<h5>Email Picker - Help</h5>
+				<h5>How It Works</h5>
 				<p>
-
+					This page demonstrates a point and click method of selecting email addresses from a long list of contacts.
+					The list would be generated from a database and displayed in a table like the one shown.
+					After making a selection by clicking the checkbox in the first column, the email addresses are assembled into
+					a long string of addresses which you can cut and past into the TO, or BCC field of an email form.
 				</p>
-
+				<h5>Preview Clipboard List Button</h5>
+				<p>
+					This button is optional feature which allows the selected items to be displayed as they appear on the clipboard.
+				</p>
+				<p>
+					You can click this button to display a green panel and when you tick an email address, it will or disappear from the panel. The names are sorted alphabetically.
+					This allows the user to review their selection.
+				</p>
+				<h5>Copy to the Clipboard Button</h5>
+				<p>
+					Clicking the button places the list of email addresses onto the clipboard. The system displays a confirmation message that a paste operation can be made.
+					You can check this by opening a text editor (Notepad) and pasting the list into the page.
+				</p>
+				<h5>Select/Deselect Check Box</h5>
+				<p>
+					This checkbox appears on the top left of the table; clicking it will place or remove a tick in all the checkboxes.
+				</p>
+				<h5>Filter</h5>
+				<p>
+					Typing the first few characters of a person's name or department will filter the table so you can tick the required email addresses.
+					Whilst using this feature you can't use the Preview or Copy buttons.
+				</p>
 			</div>
 		</div>
 	</div>
 </div>
+
 @code {
+
 	List<Contact> ContactList = new List<Contact>();
-	string ShowOffCanvasEmailList { get; set; } = ""; //Default "", hides the list and "show" makes it appear
 	bool Preview { get; set; } = false; // Shows the EmailList formatted for pasting into a form or document
 	List<string> EmailList = new List<string>(); // The list that appears in the off canvas form
 	string SortedString = string.Empty; // The preview list displayed at the top of the form with a green (alert-success) background
 	bool ShowSpinner { get; set; } = true;
 	string ShowHelp { get; set; } = "";
+	int RowIndex { get; set; }
+	string Filter { get; set; } = "";
+	bool PreviewCopyButtonsDisabled { get; set; } = false;
 
-	#region  OKDialogRegion
+	#region OKDialogRegion
 	string? OKDlogCaption { get; set; }
 	string OKDlogMessage = string.Empty;
 	string OKDLogSize = string.Empty;
@@ -152,26 +177,34 @@
 		OKDLogVisible = false;
 	}
 	#endregion
+
 	protected override async Task OnInitializedAsync()
 	{
 		Logger.LogInformation("OnInitializedAsync started");
-
-		ContactList = await JsonFileService.GetJsonFileAsync<List<Contact>>("JsonFiles/Contacts90.json");
-		if (ContactList.Count() == 0)
+		try
 		{
-			OKDlogCaption = "On Initialized";
-			OKDlogMessage = "No contact records found" + Globals.InformDBA;
-			OKDLogSize = Globals.DLogSizeSmall;
-			OKDLogVisible = true;
-			Logger.LogInformation("No contact records found");
+			ContactList = await JSFileService.GetJsonFileAsync<List<Contact>>("JsonFiles/test.json");
+			if (ContactList.Count == 0)
+			{
+				ShowDialog("On Initialized", "No contact records found" + Globals.InformDBA, Globals.DLogSizeSmall);
+			}
 		}
-		ShowSpinner = false;
+		catch (Exception ex)
+		{
+			ShowDialog("Error", "Failed to load contact records: " + ex.Message, Globals.DLogSizeSmall);
+		}
+		finally
+		{
+			ShowSpinner = false;
+		}
 	}
-	async Task CheckUncheckAll(ChangeEventArgs e)
+
+	void CheckUncheckAll(ChangeEventArgs e)
 	{
 		try
 		{
 			bool checkVal = (bool)e.Value;
+			EmailList.Clear(); // In case user has ticked others and then ticks this box
 			foreach (Contact item in ContactList)
 			{
 				item.IsSelected = checkVal;
@@ -184,59 +217,112 @@
 					EmailList.Remove(item.Email);
 				}
 			}
-			if (EmailList.Count() == 0)
+			UpdateClipboardString();
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, "CheckUncheckAll - Exception");
+		}
+	}
+
+	void PreviewClick()
+	{
+		if (EmailList.Count == 0)
+		{
+			Preview = false;
+			SortedString = string.Empty;
+			return;
+		}
+		UpdateClipboardString();
+		Preview = !Preview;
+	}
+
+	void AddRemoveEmail(ChangeEventArgs e, Guid id)
+	{
+		try
+		{
+			bool checkVal = (bool)e.Value;
+			var contact = ContactList.FirstOrDefault(c => c.Id == id);
+			if (contact != null)
 			{
-				SortedString = string.Empty;
-			}
-			else
-			{
-				EmailList = EmailList.OrderBy(e => e).ToList();
-				SortedString = string.Join("; ", EmailList);
+				if (checkVal)
+				{
+					EmailList.Add(contact.Email.Trim());
+				}
+				else
+				{
+					EmailList.Remove(contact.Email.Trim());
+				}
+				UpdateClipboardString();
 			}
 		}
 		catch (Exception ex)
 		{
-			Logger.LogInformation("CheckUncheckAll - Exception: " + ex.Message);
+			Logger.LogError(ex, "AddRemoveEmail - Exception");
 		}
 	}
-	void PreviewClick()
+
+	async Task CopyToClipBoardClick()
 	{
-		SortedString = string.Join("; ", EmailList);
-		Preview = !Preview;
-	}
-	async Task AddRemoveEmail(ChangeEventArgs e, Guid id)
-	{
-		bool checkVal = (bool)e.Value;
-		Contact contact = ContactList.FirstOrDefault(c => c.Id == id);
-		if (checkVal)
+		if (EmailList.Count == 0)
 		{
-			EmailList.Add(contact.Email.Trim());
-			EmailList = EmailList.OrderBy(e => e).ToList();
+			ShowDialog("Copy to Clipboard", "No email addresses selected. Please try again", Globals.DLogSizeSmall);
+			Logger.LogInformation("No email addresses selected");
+			return;
+		}
+		await JSRuntime.InvokeVoidAsync("copyTextToClipboard", SortedString);
+		Logger.LogInformation("copyTextToClipboard, items: " + EmailList.Count);
+	}
+
+	void UpdateClipboardString()
+	{
+		if (EmailList.Count == 0)
+		{
+			SortedString = string.Empty;
+			Preview = false;
 		}
 		else
 		{
-			EmailList.Remove(contact.Email.Trim());
+			EmailList = EmailList.OrderBy(e => e).ToList();
+			SortedString = string.Join("; ", EmailList);
 		}
-		SortedString = string.Join("; ", EmailList);
 	}
-	async Task CopyToClipBoardClick()
+
+	private bool IsVisible(string SearchString)
 	{
-		if (SortedString.Length == 0)
+		//Shows rows that have filter text
+		if (string.IsNullOrEmpty(Filter))
+		{
+			return true;
+		}
+
+		if (SearchString.Contains(Filter, StringComparison.OrdinalIgnoreCase))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	void ShowDialog(string caption, string message, string size)
 	{
-			OKDlogCaption = "Copy To Clipboard Click";
-			OKDlogMessage = "No text to copy, please tick at least one name";
-			OKDLogSize = Globals.DLogSizeSmall;
-			OKDLogVisible = true;
-			Logger.LogInformation(OKDlogMessage);
-			return;
+		OKDlogCaption = caption;
+		OKDlogMessage = message;
+		OKDLogSize = size;
+		OKDLogVisible = true;
 	}
-		await JSRuntime.InvokeVoidAsync("copyTextToClipboard", SortedString);
-		Logger.LogInformation("copyTextToClipboard, items: " + EmailList.Count().ToString());
+
+	public void ValueChanged(string amendedFilter)
+	{
+		
+		Filter = amendedFilter;
+		PreviewCopyButtonsDisabled = Filter.Length > 0;
 	}
+
 	void HomeClick()
 	{
 		NavMan.NavigateTo("/");
 	}
+
 	void ShowHelpClick()
 	{
 		ShowHelp = "show";
@@ -244,10 +330,15 @@
 
 	void HideHelpClick()
 	{
-		// Is the help panel showing?
-		if (ShowHelp == "show")
-		{
-			ShowHelp = "";
-		}
+		ShowHelp = ShowHelp == "show" ? "" : "show";
 	}
+
+	// async Task  UpdateData()
+	// {
+	// 	foreach (Contact contact in ContactList)
+	// 	{
+	// 		contact.LoadSearchString();
+	// 	}
+	// 	await JSFileService.SaveJsonFileAsync("c:/temp/temp.json", ContactList);
+	// }
 }

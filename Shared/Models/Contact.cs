@@ -41,8 +41,20 @@ namespace BlazorApp.Shared
         [DisplayName("Department")]
         [Required]
         [StringLength(64, ErrorMessage = "Department is too long. (Max chars: 64)")]
-        public string Department { get; set; }
-        public bool IsVisible { get; set; }
+        public string Department { get; set; }	= string.Empty;
+		public bool IsVisible { get; set; }
         public bool IsSelected { get; set; }
-    }
+
+		public string SearchString { get; set; } = string.Empty;
+
+		public void LoadSearchString()
+		{
+			SearchString += ContactName == string.Empty?"":ContactName;
+			SearchString += JobDescription == string.Empty ? "" : JobDescription;
+			SearchString += Email == string.Empty ? "" : Email;
+			SearchString += Extension == string.Empty ? "" : Extension;
+			SearchString += Department == string.Empty ? "" : Department;
+			SearchString += Mobile == string.Empty ? "" : Mobile;
+		}
+	}
 }

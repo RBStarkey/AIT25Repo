@@ -1,42 +1,60 @@
 ﻿@page "/specification"
-<div class="container">
+@inject Microsoft.AspNetCore.Components.NavigationManager NavMan
 
-	<h3>Specification - First Meeting</h3>
-	<p>
-		We meet and discuss the options available.  We explain the synergies, strengths and weaknesses of the options. We will give you an approximate price.  There is no charge for this part of the service.
-	</p>
-	<h3>Initial Specification</h3>
-	<h5>
+<div class="container-fluid p-0 m-0">
+	<div class="row row-header w-100 d-inline-flex" style="background-color:navy">
+		<div class="col-sm-1">
+			<i class="bi bi-house-door" style="font-size: 2rem; color: white" data-toggle="tooltip" data-placement="bottom" title="Home" @onclick="HomeClick"></i>
+		</div>
+		<div class="col-sm-10 d-flex justify-content-center mt-2" style="color:white">
+			<h3>Specification</h3>
+		</div>
+		<div class="col-sm-1 d-flex justify-content-end">
+			<button class="btn-link" style="background-color:transparent;border-color:transparent">
+				<i class="bi bi-info-circle m-0 p-0" style="font-size: 2rem; color: transparent;"></i>
+			</button>
+		</div>
+	</div>
+	<h4 class="pt-2 pb-2">We meet and discuss the options available.  We explain the synergies, strengths and weaknesses of the options. We will give you an approximate price.  There is no charge for this part of the service.</h4>
+	
+	<div style="background-color:Gainsboro; padding-left:0.5em;padding-top:0.5em; padding-bottom:0.02em">
+		<h3>Initial Specification</h3>
+	</div>
+	<h4>
 		Having met and discussed requirements and a price, you may like us to proceed to drawing up a specification document; this is usually four to six-page long.
 		Sometimes it helps if you can see what we envisage to be the requirement, so we build a mock-up front-end comprising just forms; they does nothing other than look like the final design.
 		We find that at this point you recognise the nuances of your requirement which have escaped our understanding. Then, there is then a flurry of emails as the final design takes shape.
 		The document and the mock-ups shuttle back and forth as ypur understanding of the system is firmed up.
 		At the end of the process, you will understand what we intend to build for you in considerable detail.
-	</h5>
-
-	<h3>Final Specification</h3>
-	<h5>The final document will be structured along the following lines...</h5>
-	<ol style="font-size:1.25em">
+	</h4>
+	<div style="background-color:Gainsboro; padding-left:0.5em;padding-top:0.5em; padding-bottom:0.02em">
+		<h3>Final Specification</h3>
+	</div>
+	<h4>The final document will be structured along the following lines...</h4>
+	<ol style="font-size:1.4em">
 		<li>Requirements - A paragraph stating in broad terms what benefits you want the database to bring</li>
 		<li>History - Brief narrative of how you arrived at the decision to create this database</li>
 		<li>How Will It Work? - a description of the how data enters the system, is checked, rejected, modified, stored, displayed and reported on</li>
 		<li>Security provisions for the new system</li>
-		<li>Back up provision</li>
-		<li>Quality standards for code</li>
-		<li>Deliverables - A list of the main tables forms and reports</li>
-		<li>Response Times - a statement that response times will be accetable according to local web standards and that the system will be robust and dependable</li>
-		<li>Our assumptions about your obligations with regard to Data Protection</li>
-		<li>Concerns - we will list areas where we feel that your expectations may not be met - e.g. your network may be saturated or your bandwidth is too small.</li>
+		<li>Back-up provision</li>
+		<li>Quality standards for code (augmented by Github Copilot with the latest AI improvements)</li>
+		<li>Deliverables - a list of the main tables forms and reports</li>
+		<li>Response Times - a statement that response times will be acceptable according to local web trnsmission speeds and that the system will be robust and dependable</li>
+		<li>Our assumptions about your obligations regarding Data Protection</li>
+		<li>Concerns - we will list areas where we feel that your expectations may not be met - e.g. your network may be saturated or your bandwidth is too narrow.</li>
 		<li>Non-Disclosure and Data-Protection assurances</li>
 		<li>Price, VAT</li>
 		<li>Terms - invoice to be issued when the system meets the requirements in the specification and has been up and running for at a month.  Payment is expected within 21 days</li>
 		<li>Copyright - to pass to you when payment is received in full</li>
 		<li>Timetable - a set of stages and a delivery date. Usually these are finalised after you have perused the specification</li>
-		<li>Changes to the Specification - a paragraph explaining that minor and cosmetic changes can be made during the build process, but major changes will require a price revision</li>
+		<li>Changes to the Specification - a paragraph explaining that minor and cosmetic changes can be made during the build process, but major changes may require a price revision</li>
 		<li>Support - a paragraph asserting that we will fix bugs for free</li>
 	</ol>
 </div>
 
 @code {
-
+	void HomeClick()
+	{
+		NavMan.NavigateTo("/");
+	}
 }

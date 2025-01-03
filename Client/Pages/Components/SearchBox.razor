@@ -1,12 +1,11 @@
 ﻿@using System.Timers;
-@using BlazorApp.Shared
 
 @implements IDisposable
 
 <div class="input-group align-items-center" style="width:10em">
-	<input id="inputSearch" name="inputSearch" class="form-control"
-		   placeholder=@Globals.SearchDotDotDot @attributes="AdditionalAttributes"
-		   @bind="SearchQuery" @bind:event="oninput"
+	<input id="inputSearch" name="inputSearch" class="form-control" 
+		placeholder=@Globals.FilterDotDotDot @attributes="AdditionalAttributes" 
+		@bind="SearchQuery" @bind:event="oninput"
 		   spellcheck="false" type="text" style="background-color:cornsilk" />
 	<i class="bi bi-x position-absolute"
 	   style="
@@ -14,15 +13,14 @@
 			font-size:30px;
 			right: 2px;
 			cursor: pointer;
-			z-index: 100;" @onclick=ClearFilter>
+			z-index: 100;"
+	   @onclick=DeleteFilter>
 	</i>
 </div>
+
 @code {
 	Timer? debounceTimer;
 	string? searchQuery;
-
-	[Parameter]
-	public string? PlaceHolder { get; set; } = Globals.SearchDotDotDot;
 
 	[Parameter]
 	public string? SearchQuery
@@ -35,34 +33,47 @@
 			debounceTimer?.Start();
 		}
 	}
+
 	[Parameter(CaptureUnmatchedValues = true)]
-    public IDictionary<string, object>? AdditionalAttributes { get; set; }
+	public IDictionary<string, object>? AdditionalAttributes { get; set; }
 
-    [Parameter]
-    public int Debounce { get; set; } = 1000;
+	[Parameter]
+	public EventCallback<string> RemoveFilter { get; set; }
 
-    [Parameter]
+	[Parameter]
+	public EventCallback<string> NewSearchValue { get; set; }
+
+	[Parameter]
 	public EventCallback<string> SearchQueryChanged { get; set; }
 
-    protected override void OnInitialized()
-    {
-        debounceTimer = new Timer();
-        debounceTimer.Interval = Debounce;
-        debounceTimer.AutoReset = false;
-        debounceTimer.Elapsed += Search;
-    }
-
-    async void Search(Object? source, ElapsedEventArgs e)
-    {
-		await InvokeAsync(() => SearchQueryChanged.InvokeAsync(SearchQuery));
-    }
-
-    public void Dispose()
-    {
-        debounceTimer!.Dispose();
-    }
-	public async void ClearFilter()
+	protected override void OnInitialized()
 	{
-		await InvokeAsync(() => SearchQueryChanged.InvokeAsync());
+		debounceTimer = new Timer();
+		debounceTimer.Interval = 500; // 0.5 second
+		debounceTimer.AutoReset = false;
+		debounceTimer.Elapsed += Search;
+	}
+	void SetSearchValue(Object? source, ElapsedEventArgs e)
+	{
+		Task t = Task.Run(() =>
+		{
+			SearchQuery = e.ToString();
+		});
+	}
+
+	async void Search(Object? source, ElapsedEventArgs e)
+	{
+		await InvokeAsync(() => SearchQueryChanged.InvokeAsync(SearchQuery));
+	}
+
+	public void Dispose()
+	{
+		debounceTimer!.Dispose();
+	}
+
+	public async void DeleteFilter()
+	{
+		SearchQuery = string.Empty;
+		await InvokeAsync(() => RemoveFilter.InvokeAsync());
 	}
 }

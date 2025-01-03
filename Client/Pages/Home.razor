@@ -1,15 +1,18 @@
 ﻿@page "/"
 @using BlazorApp.Shared
-<PageTitle>Home</PageTitle>
+<PageTitle>AIT	Home</PageTitle>
 <div class="container-fluid p-0 m-0">
-	<div class="row w-100 d-inline-flex pt-2" style="background-color:navy">
-		<div class="col-sm-11 d-flex justify-content-center" style="padding-top:0.6em">
-			<h3 style="color:white">@Globals.AITLtd&nbsp v1.00</h3>
+	<div class="row row-header w-100 d-inline-flex" style="background-color:navy">
+		<div class="col-sm-1">
+			<i class="bi bi-house-door" style="font-size: 2rem; color: white" data-toggle="tooltip" data-placement="bottom" title="Home" @onclick="HelpClick"></i>
 		</div>
-		<div class="col-sm-1 d-flex justify-content-end" style="padding-top:0.7em">
+		<div class="col-sm-10 d-flex justify-content-center mt-2" style="color:white">
+			<h3>@Globals.AITLtd&nbsp v1.00</h3>
+		</div>
+		<div class="col-sm-1 d-flex justify-content-end">
 			<button class="btn-link" style="background-color:transparent;border-color:transparent"
 					@onclick=HelpClick>
-				<sup><i class="bi bi-info-circle" style="font-size: 2rem; color: white;"></i></sup>
+				<i class="bi bi-info-circle m-0 p-0" style="font-size: 2rem; color: white;"></i>
 			</button>
 		</div>
 	</div>
